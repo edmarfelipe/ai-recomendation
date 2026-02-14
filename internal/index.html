@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>AI Recommendation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/dist/cdn.min.js"></script>
+    <script>
+        function loadMovies(searchTerm) {
+            if (searchTerm?.length < 3) {
+                return Promise.resolve([]);
+            }
+
+            console.log('Loading movies for search term:', searchTerm);
+            const url = `/v1/movies?query=${encodeURIComponent(searchTerm)}`;
+
+            return fetch(url)
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error fetching movies:', error);
+                });
+        }
+    </script>
+    <style>
+        :root {
+            --pico-primary: #00e1ff;
+            --pico-font-family: "Rubik", sans-serif;
+            --pico-border-radius: 1rem;
+            --pico-spacing: 1.5rem;
+        }
+
+        body {
+            padding: calc(var(--pico-spacing) * 2) 0;
+        }
+
+        body:before {
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: .4em;
+            background-color: var(--pico-primary);
+            content: "";
+        }
+
+        h1 {
+            margin-bottom: calc(var(--pico-spacing) / 4);
+        }
+
+        .container-fluid {
+            max-width: 950px;
+        }
+
+        .badges {
+            display: flex;
+            gap: calc(var(--pico-spacing)/ 3);
+            margin-bottom: calc(var(--pico-spacing)/ 2);
+        }
+
+        .badge {
+            padding: .125rem .25rem;
+            border-radius: .125rem;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            vertical-align: text-bottom;
+            background-color: #607d8b1a;
+            color: #607D8B;
+        }
+
+        .badge.war {
+            background-color: #c03a2b3a;
+            color: #e74c3c;
+        }
+
+        .badge.history {
+            background-color: #27ae603a;
+            color: #27ae60;
+        }
+
+        .badge.drama {
+            background-color: #3498db44;
+            color: #2980b9;
+        }
+
+        .badge.action {
+            background-color: #d3540046;
+            color: #f39c12;
+        }
+
+        .badge.comedy {
+            background-color: rgba(188, 166.5, 99.5, .125);
+            color: rgb(188, 166.5, 99.5);
+        }
+
+        .badge.thriller {
+            background-color: #8e44ad3a;
+            color: #9b59b6;
+        }
+
+        .badge.crime {
+            background-color: #0f5ead38;
+            color: #0f5ead;
+        }
+
+        .badge.adventure {
+            background-color: #16a0853a;
+            color: #1abc9c;
+        }
+
+        .badge.romance {
+            background-color: #e91e633a;
+            color: #a33259;
+        }
+
+        .badge.music {
+            background-color: #9c27b03a;
+            color: #9c27b0;
+        }
+
+        .badge.science {
+            background-color: #3a07c965;
+            color: #7c5bd7;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="container-fluid">
+        <hgroup>
+            <h1>AI Recommendation</h1>
+            <p>Search movies using the power of AI, leveraging Gemini embeddings, PostgreSQL with pgvector, and Go for
+                efficient data processing and retrieval</p>
+        </hgroup>
+    </header>
+    <main class="container-fluid" x-data="{ query: '', isLoading: false, movies: [] }">
+        <section>
+            <input type="search"
+                name="search"
+                placeholder="Search" aria-label="Search" x-model="query"
+                @input.debounce.700ms="isLoading = true; movies = []; movies = await loadMovies(query); isLoading = false"
+            />
+
+            <article aria-busy="true" x-show="isLoading" >
+                Loading...
+            </article>
+
+            <article x-show="!movies?.length && !isLoading">
+                <hgroup>
+                    <h2>No Results</h2>
+                    <p>Use the search box above to find movies.</p>
+                </hgroup>
+            </article>
+            <template x-for="movie in movies">
+                <article>
+                    <div class="badges">
+                        <template x-for="genre in movie.genres">
+                            <span class="badge" :class="genre.toLowerCase()" x-text="genre"></span>
+                        </template>
+                    </div>
+                    <hgroup>
+                        <h2 x-text="movie.title"></h2>
+                        <p x-text="movie.overview"></p>
+                    </hgroup>
+                </article>
+            </template>
+        </section>
+    </main>
+</body>
+
+</html>
