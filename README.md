@@ -39,24 +39,6 @@ This project uses PostgreSQL with the **pgvector** extension to store and manage
    make run
    ```
 
-## Using the Service
-
-### Generating Embeddings
-
-To generate embeddings for the movie dataset, send a POST request to the `/v1/movies/generate-embeddings` endpoint.
-
-```bash
- curl -X POST http://localhost:9999/v1/movies/generate-embeddings
-```
-
-### Searching for Movies
-
-To search for movies, send a GET request to the `/v1/movies` endpoint with the `query` parameter.
-
-```bash
-curl -X GET http://localhost:9999/v1/movies?query=bat
-```
-
 # Links
 
 - https://github.com/pgvector/pgvector
